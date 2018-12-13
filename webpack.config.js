@@ -160,7 +160,7 @@ module.exports = env => {
                             loader: "nativescript-dev-webpack/bundle-config-loader",
                             options: {
                                 angular: true,
-                                loadCss: !snapshot, // load the application css if in debug mode
+                                loadCss: false,
                             }
                         },
                     ].filter(loader => !!loader)
@@ -168,16 +168,16 @@ module.exports = env => {
 
                 { test: /\.html$|\.xml$/, use: "raw-loader" },
 
-                // tns-core-modules reads the app.css and its imports using css-loader
+                // tns-core-modules reads the application-wide css and its imports using css-loader
                 {
-                    test: /[\/|\\]app\.css$/,
+                    test: /[\/|\\]styles\.tns\.css$/,
                     use: {
                         loader: "css-loader",
                         options: { minimize: false, url: false },
                     }
                 },
                 {
-                    test: /[\/|\\]app\.scss$/,
+                    test: /[\/|\\]styles\.tns\.scss$/,
                     use: [
                         { loader: "css-loader", options: { minimize: false, url: false } },
                         "sass-loader"
@@ -185,8 +185,8 @@ module.exports = env => {
                 },
 
                 // Angular components reference css files and their imports using raw-loader
-                { test: /\.css$/, exclude: /[\/|\\]app\.css$/, use: "raw-loader" },
-                { test: /\.scss$/, exclude: /[\/|\\]app\.scss$/, use: ["raw-loader", "resolve-url-loader", "sass-loader"] },
+                { test: /\.css$/, exclude: /[\/|\\]styles\.tns\.css$/, use: "raw-loader" },
+                { test: /\.scss$/, exclude: /[\/|\\]styles\.tns\.scss$/, use: ["raw-loader", "resolve-url-loader", "sass-loader"] },
 
                 {
                     test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
@@ -256,6 +256,7 @@ module.exports = env => {
         config.plugins.push(new nsWebpack.NativeScriptSnapshotPlugin({
             chunk: "vendor",
             angular: true,
+            includeApplicationCss: false,
             requireModules: [
                 "reflect-metadata",
                 "@angular/platform-browser",
